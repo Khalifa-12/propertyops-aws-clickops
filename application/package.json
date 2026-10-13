@@ -1,0 +1,12 @@
+{
+  "name": "propertyops-app",
+  "version": "1.0.0",
+  "description": "PropertyOps cloud-native application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "pg": "^8.16.0"
+  }
+}

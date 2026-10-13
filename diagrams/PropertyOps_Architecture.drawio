@@ -1,0 +1,217 @@
+<mxfile host="app.diagrams.net" modified="2026-09-22T19:30:00.000Z" agent="ChatGPT" version="24.7.17" type="device">
+  <diagram id="propertyops-architecture" name="PropertyOps Architecture">
+    <mxGraphModel dx="1700" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="title" value="PropertyOps - AWS DevOps Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="20" width="560" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Internet / Clients -->
+        <mxCell id="clients" value="Users&#xa;- Landlords&#xa;- Tenants&#xa;- Tradespeople&#xa;- Admins" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="180" width="150" height="110" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="route53" value="Route 53&#xa;DNS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="240" y="195" width="110" height="70" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="cloudfront" value="CloudFront + AWS WAF&#xa;TLS / CDN / Edge Security" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="410" y="185" width="220" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- VPC -->
+        <mxCell id="vpc" value="AWS VPC (eu-west-2)" style="swimlane;html=1;rounded=1;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;fontSize=16;fontStyle=1;horizontal=1;startSize=28;" vertex="1" parent="1">
+          <mxGeometry x="680" y="90" width="860" height="690" as="geometry"/>
+        </mxCell>
+
+        <!-- Public subnets -->
+        <mxCell id="public-az1" value="Public Subnet - AZ1&#xa;(eu-west-2a)" style="swimlane;html=1;rounded=1;whiteSpace=wrap;fillColor=#e1f5fe;strokeColor=#6c8ebf;fontSize=14;fontStyle=1;startSize=24;" vertex="1" parent="vpc">
+          <mxGeometry x="20" y="40" width="390" height="180" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="public-az2" value="Public Subnet - AZ2&#xa;(eu-west-2b)" style="swimlane;html=1;rounded=1;whiteSpace=wrap;fillColor=#e1f5fe;strokeColor=#6c8ebf;fontSize=14;fontStyle=1;startSize=24;" vertex="1" parent="vpc">
+          <mxGeometry x="440" y="40" width="390" height="180" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="igw" value="Internet Gateway" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=13;" vertex="1" parent="vpc">
+          <mxGeometry x="330" y="10" width="160" height="28" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="alb" value="Application Load Balancer&#xa;Health checks / Routing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="vpc">
+          <mxGeometry x="260" y="85" width="300" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="nat1" value="NAT Gateway 1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="public-az1">
+          <mxGeometry x="25" y="70" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="nat2" value="NAT Gateway 2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="public-az2">
+          <mxGeometry x="225" y="70" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Private app subnets -->
+        <mxCell id="private-az1" value="Private App Subnet - AZ1" style="swimlane;html=1;rounded=1;whiteSpace=wrap;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=14;fontStyle=1;startSize=24;" vertex="1" parent="vpc">
+          <mxGeometry x="20" y="250" width="390" height="200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="private-az2" value="Private App Subnet - AZ2" style="swimlane;html=1;rounded=1;whiteSpace=wrap;fillColor=#e8f5e9;strokeColor=#82b366;fontSize=14;fontStyle=1;startSize=24;" vertex="1" parent="vpc">
+          <mxGeometry x="440" y="250" width="390" height="200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ecs1" value="ECS Fargate Tasks&#xa;PropertyOps API / Web App" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="private-az1">
+          <mxGeometry x="45" y="55" width="300" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ecs2" value="ECS Fargate Tasks&#xa;PropertyOps API / Web App" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="private-az2">
+          <mxGeometry x="45" y="55" width="300" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="autoscaling" value="ECS Service Auto Scaling&#xa;CPU / Memory / Request-based" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;" vertex="1" parent="vpc">
+          <mxGeometry x="310" y="460" width="230" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- DB tier -->
+        <mxCell id="db-tier" value="Private Data Layer" style="swimlane;html=1;rounded=1;whiteSpace=wrap;fillColor=#f8eaf6;strokeColor=#9673a6;fontSize=14;fontStyle=1;startSize=24;" vertex="1" parent="vpc">
+          <mxGeometry x="20" y="540" width="540" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="rds" value="Amazon RDS PostgreSQL&#xa;Multi-AZ / Backups / Encryption" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;" vertex="1" parent="db-tier">
+          <mxGeometry x="120" y="35" width="300" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Observability and security services -->
+        <mxCell id="services" value="Shared AWS Services" style="swimlane;html=1;rounded=1;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;fontStyle=1;startSize=24;" vertex="1" parent="vpc">
+          <mxGeometry x="590" y="250" width="220" height="410" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ecr" value="Amazon ECR&#xa;Container Images" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="services">
+          <mxGeometry x="20" y="35" width="180" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="secrets" value="Secrets Manager&#xa;DB credentials / app secrets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=13;" vertex="1" parent="services">
+          <mxGeometry x="20" y="105" width="180" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="s3" value="S3 Bucket&#xa;Issue photos / documents / exports" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="services">
+          <mxGeometry x="20" y="175" width="180" height="55" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="cw" value="CloudWatch&#xa;Logs / Metrics / Dashboard / Alarms" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="services">
+          <mxGeometry x="20" y="245" width="180" height="65" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="sns" value="SNS&#xa;Alert Notifications" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;" vertex="1" parent="services">
+          <mxGeometry x="20" y="325" width="180" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- VPC endpoints -->
+        <mxCell id="vpce" value="VPC Endpoints&#xa;ECR / S3 / Secrets Manager / CloudWatch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;" vertex="1" parent="vpc">
+          <mxGeometry x="600" y="680" width="220" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- CI/CD side -->
+        <mxCell id="github" value="GitHub Repository&#xa;App + Terraform + Docs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="510" width="180" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="gha" value="GitHub Actions CI/CD&#xa;Tests / TFLint / Checkov&#xa;Docker Build / Trivy / Deploy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="270" y="485" width="240" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="oidc" value="AWS IAM OIDC Role&#xa;Federated Deploy Access" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="560" y="510" width="180" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Notes -->
+        <mxCell id="note" value="Key recruiter-ready DevOps features:&#xa;• Reusable Terraform modules&#xa;• ECS Fargate on private subnets&#xa;• ALB + autoscaling + HA across 2 AZs&#xa;• RDS PostgreSQL + backups + encryption&#xa;• GitHub Actions with OIDC&#xa;• Trivy / Checkov / TFLint&#xa;• CloudWatch dashboards and alarms&#xa;• S3 for media uploads" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="660" width="500" height="180" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e1" edge="1" parent="1" source="clients" target="route53" style="endArrow=block;html=1;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="route53" target="cloudfront" style="endArrow=block;html=1;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="cloudfront" target="alb" style="endArrow=block;html=1;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="vpc" source="igw" target="alb" style="endArrow=block;html=1;strokeWidth=1.5;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="vpc" source="alb" target="ecs1" style="endArrow=block;html=1;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="vpc" source="alb" target="ecs2" style="endArrow=block;html=1;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="vpc" source="nat1" target="ecs1" style="dashed=1;endArrow=block;html=1;strokeWidth=1.5;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="vpc" source="nat2" target="ecs2" style="dashed=1;endArrow=block;html=1;strokeWidth=1.5;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="vpc" source="ecs1" target="rds" style="endArrow=block;html=1;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="vpc" source="ecs2" target="rds" style="endArrow=block;html=1;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="vpc" source="ecr" target="ecs1" style="dashed=1;endArrow=block;html=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="vpc" source="ecr" target="ecs2" style="dashed=1;endArrow=block;html=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e13" edge="1" parent="vpc" source="secrets" target="ecs1" style="dashed=1;endArrow=block;html=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="vpc" source="secrets" target="ecs2" style="dashed=1;endArrow=block;html=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="vpc" source="s3" target="ecs1" style="dashed=1;endArrow=block;html=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="vpc" source="s3" target="ecs2" style="dashed=1;endArrow=block;html=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e17" edge="1" parent="vpc" source="ecs1" target="cw" style="dashed=1;endArrow=block;html=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e18" edge="1" parent="vpc" source="ecs2" target="cw" style="dashed=1;endArrow=block;html=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e19" edge="1" parent="vpc" source="cw" target="sns" style="endArrow=block;html=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e20" edge="1" parent="1" source="github" target="gha" style="endArrow=block;html=1;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e21" edge="1" parent="1" source="gha" target="oidc" style="endArrow=block;html=1;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e22" edge="1" parent="1" source="oidc" target="ecr" style="endArrow=block;html=1;strokeWidth=2;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e23" value="Terraform Deploy" edge="1" parent="1" source="gha" target="alb" style="dashed=1;endArrow=block;html=1;strokeWidth=1.5;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e24" edge="1" parent="vpc" source="vpce" target="services" style="dashed=1;endArrow=block;html=1;strokeWidth=1.2;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e25" edge="1" parent="vpc" source="autoscaling" target="ecs1" style="dashed=1;endArrow=block;html=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e26" edge="1" parent="vpc" source="autoscaling" target="ecs2" style="dashed=1;endArrow=block;html=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

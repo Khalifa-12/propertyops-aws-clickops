@@ -27,6 +27,9 @@ The platform was deployed using:
 - Multi-AZ networking
 
 ---
+## Architecture Diagram
+
+![PropertyOps AWS Architecture](diagrams/PropertyOps_Architecture.png)
 
 ## Architecture
 

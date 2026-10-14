@@ -5,6 +5,11 @@ PropertyOps is a cloud-native property maintenance platform deployed manually on
 This repository documents the **ClickOps implementation** of the platform. The infrastructure was built manually through the AWS Management Console before being recreated separately using Terraform.
 
 ---
+## Architecture Diagram
+
+![PropertyOps AWS Architecture](diagrams/PropertyOps_Architecture.png)
+
+---
 
 ## Project Overview
 
@@ -27,9 +32,6 @@ The platform was deployed using:
 - Multi-AZ networking
 
 ---
-## Architecture Diagram
-
-![PropertyOps AWS Architecture](diagrams/PropertyOps_Architecture.png)
 
 ## Architecture
 

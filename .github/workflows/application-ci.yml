@@ -1,0 +1,49 @@
+name: PropertyOps application CI
+
+on:
+  pull_request:
+    paths:
+      - 'application/**'
+      - '.github/workflows/application-ci.yml'
+      - '.github/workflows/ecs-deploy.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'application/**'
+      - '.github/workflows/application-ci.yml'
+      - '.github/workflows/ecs-deploy.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: application/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+        working-directory: application
+      - name: Syntax check
+        run: node --check server.js
+        working-directory: application
+      - name: Build Docker image
+        run: docker build --tag propertyops:ci ./application
+      - name: Container health smoke test
+        run: |
+          docker run -d --name propertyops-ci -p 127.0.0.1:8080:80 propertyops:ci
+          trap 'docker logs propertyops-ci; docker rm -f propertyops-ci' EXIT
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:8080/health | grep -q '"status":"ok"'; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo 'Health endpoint did not become ready' >&2
+          exit 1

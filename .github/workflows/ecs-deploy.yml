@@ -1,0 +1,120 @@
+name: Reusable AWS ECS deployment
+
+# Call this workflow from another application repository or run manually.
+# Set up GitHub environment 'propertyops-production' with required reviewers
+# BEFORE supplying the AWS deploy role. This workflow never runs on push.
+on:
+  workflow_call:
+    inputs:
+      aws_region:
+        type: string
+        required: true
+      ecr_repository:
+        type: string
+        required: true
+      ecs_cluster:
+        type: string
+        required: true
+      ecs_service:
+        type: string
+        required: true
+      ecs_container:
+        type: string
+        required: true
+      docker_context:
+        type: string
+        required: false
+        default: ./application
+    secrets:
+      AWS_DEPLOY_ROLE_ARN:
+        required: true
+  workflow_dispatch:
+    inputs:
+      aws_region:
+        description: AWS region
+        required: true
+        default: eu-west-2
+      ecr_repository:
+        description: Existing ECR repository name
+        required: true
+        default: propertyops-app
+      ecs_cluster:
+        description: Existing ECS cluster
+        required: true
+        default: propertyops-cluster
+      ecs_service:
+        description: Existing ECS service
+        required: true
+        default: propertyops-service
+      ecs_container:
+        description: Container name in current ECS task definition
+        required: true
+        default: propertyops-container
+      docker_context:
+        description: Docker build directory
+        required: true
+        default: ./application
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: ecs-deploy-${{ inputs.ecs_cluster }}-${{ inputs.ecs_service }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: propertyops-production
+    timeout-minutes: 30
+    steps:
+      - name: Checkout application
+        uses: actions/checkout@v4
+      - name: Authenticate to AWS using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ inputs.aws_region }}
+      - name: Log in to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push image tagged with commit SHA
+        id: image
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          REPOSITORY: ${{ inputs.ecr_repository }}
+          IMAGE_TAG: ${{ github.sha }}
+          DOCKER_CONTEXT: ${{ inputs.docker_context }}
+        run: |
+          set -euo pipefail
+          IMAGE="$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+          docker build -t "$IMAGE" "$DOCKER_CONTEXT"
+          docker push "$IMAGE"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+      - name: Download existing task definition
+        env:
+          CLUSTER: ${{ inputs.ecs_cluster }}
+          SERVICE: ${{ inputs.ecs_service }}
+        run: |
+          set -euo pipefail
+          TASK_DEF_ARN="$(aws ecs describe-services --cluster "$CLUSTER" --services "$SERVICE" --query 'services[0].taskDefinition' --output text)"
+          if [[ -z "$TASK_DEF_ARN" || "$TASK_DEF_ARN" == "None" ]]; then
+            echo "ECS service/task definition not found" >&2
+            exit 1
+          fi
+          aws ecs describe-task-definition --task-definition "$TASK_DEF_ARN" --query taskDefinition > task-definition.json
+      - name: Set new container image
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ inputs.ecs_container }}
+          image: ${{ steps.image.outputs.image }}
+      - name: Deploy updated task and wait for stability
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ inputs.ecs_service }}
+          cluster: ${{ inputs.ecs_cluster }}
+          wait-for-service-stability: true
